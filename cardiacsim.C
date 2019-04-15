@@ -151,14 +151,31 @@ int main (int argc, char** argv)
   // boundaries of the computation box
   int grid_size = n/P;
 
+  int sizes[2]    = {m+2, n+2}; // gA size
+  int subsizes[2] = {grid_size+2, n+2}; // lA size
+  int starts[2]   = {0,0}; // where this one starts
+  MPI_Datatype type, subarrtype;
+  MPI_Type_create_subarray(2, sizes, subsizes, starts, MPI_ORDER_C, MPI_DOUBLE, &type);
+  MPI_Type_create_resized(type, 0, (grid_size+2) * sizeof(double), &subarrtype);
+  MPI_Type_commit(&subarrtype);
+
   E = alloc2D(m+2,n+2);
   E_prev = alloc2D(m+2,n+2);
   R = alloc2D(m+2,n+2);
 
-  my_E = alloc2D(grid_size,n);
-  my_E_prev = alloc2D(grid_size+2,n);
-  my_R = alloc2D(grid_size+2,n);
+  my_E = alloc2D(grid_size+2,n+2);
+  my_E_prev = alloc2D(grid_size+2,n+2);
+  my_R = alloc2D(grid_size+2,n+2);
+  
+  // my_E = alloc2D(grid_size,n);
+  // my_E_prev = alloc2D(grid_size+2,n+2);
+  // my_R = alloc2D(grid_size,n);
 
+  // For 2D geometry
+  // my_E = alloc2D(grid_size,grid_size);
+  // my_E_prev = alloc2D(grid_size+2,grid_size+2);
+  // my_R = alloc2D(grid_size,grid_size);
+  
   int i,j;
   // Initialization
   for (j=1; j<=m; j++)
@@ -200,44 +217,93 @@ int main (int argc, char** argv)
   double t = 0.0;
   // Integer timestep number
   int niter=0;
+
+  // Make E, E_prev and R 1D
+
+  int sendcounts[P];
+  int displs[P];
+  if (myrank == 0) {
+    for (int i = 0; i < P; i++) {
+      sendcounts[i] = (grid_size+2) * (n+2);
+    }
+    int disp = 0;
+    for (int i=0; i < P; i++) {
+      displs[i] = disp;
+      disp += (grid_size+2) * (n+2);
+    }
+  }
+
   
   while (t<T) {
     
     t += dt;
     niter++;
 
-    // MPI Scatter here
-    // E and R
-    // We scatter E_prev with overlapping for ghost cells
-    
-    simulate(E, E_prev, R, alpha, n, m, kk, dt, a, epsilon, M1, M2, b);
+    // flatten all of them here
 
-    // MPI Gather here
-    // E, R
+    MPI_Scatterv(E, sendcounts, displs, subarrtype, my_E,
+		 (grid_size+2) * (n+2), MPI_DOUBLE,
+		 0, MPI_COMM_WORLD);
+    MPI_Scatterv(R, sendcounts, displs, subarrtype, my_R,
+		 (grid_size+2) * (n+2), MPI_DOUBLE,
+		 0, MPI_COMM_WORLD);
+    MPI_Scatterv(E_prev, sendcounts, displs, subarrtype, my_E_prev,
+		 (grid_size+2) * (n+2), MPI_DOUBLE,
+		 0, MPI_COMM_WORLD);
+
+    // make our my_* 2D again!
+    
+    simulate(my_E, my_E_prev, my_R, alpha, n, m, kk, dt, a, epsilon, M1, M2, b);
+
+    // make our my_* 1D again!
+    
+    MPI_Gatherv(my_E, (grid_size+2) * (n+2), MPI_DOUBLE,
+		E, sendcounts, displs, subarrtype,
+		0, MPI_COMM_WORLD);
+    MPI_Gatherv(my_R, (grid_size+2) * (n+2), MPI_DOUBLE,
+		R, sendcounts, displs, subarrtype,
+		0, MPI_COMM_WORLD);
 
     //swap current E with previous E
-    double **tmp = E; E = E_prev; E_prev = tmp;
+    // double **tmp = E; E = E_prev; E_prev = tmp;
+    double *tmp = E; E = E_prev; E_prev = tmp;
 
     // Maybe we can still do this part inside simulate, letting only first and last grid in 1D geometry. But it gets complicated in 2D geometry. This parallelism might even create more overhead.
-    for (j=1; j<=m; j++)
-      E_prev[j][0] = E_prev[j][2];
-    for (j=1; j<=m; j++)
-      E_prev[j][n+1] = E_prev[j][n-1];
+    // for (j=1; j<=m; j++)
+    //   E_prev[j][0] = E_prev[j][2];
+    // for (j=1; j<=m; j++)
+    //   E_prev[j][n+1] = E_prev[j][n-1];
 
-    for (i=1; i<=n; i++) 
-      E_prev[0][i] = E_prev[2][i];
-    for (i=1; i<=n; i++)
-      E_prev[m+1][i] = E_prev[m-1][i];
+    // for (i=1; i<=n; i++) 
+    //   E_prev[0][i] = E_prev[2][i];
+    // for (i=1; i<=n; i++)
+    //   E_prev[m+1][i] = E_prev[m-1][i];
+
+    // 1D
+    for (j=n+2; j<(m+1)*(n+2); j+=n+2)
+      E_prev[j] = E_prev[j+2]
+    for (j=2n+3; j<(m+1)*(n+2); j+=n+2)
+      E_prev[j] = E_prev[j-2]
+
+    for (i=n+2; i<2n+4; i++)
+      E_prev[i-n-2] = E_prev[i+n+2]
+    for (i=m*(n+2); i<(m+1)*(n+2); i++)
+      E_prev[i+n+2] = E_prev[i-n-2]
 
     
     if (plot_freq){
+
+      // make E 2D again!
       int k = (int)(t/plot_freq);
       if ((t - k * plot_freq) < dt){
 	splot(E,t,niter,m+2,n+2);
       }
+      //make E 1D again!
     }
   }//end of while loop
 
+  MPI_Finalize();
+  
   double time_elapsed = getTime() - t0;
 
   double Gflops = (double)(niter * (1E-9 * n * n ) * 28.0) / time_elapsed ;
