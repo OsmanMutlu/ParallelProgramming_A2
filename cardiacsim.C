@@ -90,13 +90,16 @@ void simulate (double** E,  double** E_prev,double** R,
      * Using mirror boundaries
      */
 
+  cout << "Before PDE" << endl;
+
     // Solve for the excitation, the PDE
     for (j=1; j<=m; j++){
       for (i=1; i<=n; i++) {
 	E[j][i] = E_prev[j][i]+alpha*(E_prev[j][i+1]+E_prev[j][i-1]-4*E_prev[j][i]+E_prev[j+1][i]+E_prev[j-1][i]);
       }
     }
-    
+
+    cout << "After PDE" << endl;
     /* 
      * Solve the ODE, advancing excitation and recovery to the
      *     next timtestep
@@ -130,7 +133,7 @@ int main (int argc, char** argv)
   MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
 
   MPI_Status status;
-  MPI_Request request[4];
+  MPI_Request request[4*P];
 
   MPI_Request myE_request[P-1];
   double **my_Es[P-1];
@@ -189,6 +192,9 @@ int main (int argc, char** argv)
 
   double **my_E, **my_R, **my_E_prev, *ghost1, *ghost2, ghost3[grid_size_y], ghost4[grid_size_y], send3[grid_size_y], send4[grid_size_y];
 
+  ghost1 = (double*)malloc((grid_size_x+2) * sizeof(double));
+  ghost2 = (double*)malloc((grid_size_x+2) * sizeof(double));
+
   my_E = alloc2D(grid_size_y+2,grid_size_x+2);
   my_E_prev = alloc2D(grid_size_y+2,grid_size_x+2);
   my_R = alloc2D(grid_size_y+2,grid_size_x+2);
@@ -214,6 +220,8 @@ int main (int argc, char** argv)
     for (i=1; i<=n; i++)
       R[j][i] = 1.0;
   // }
+
+  cout << "Before my_E inits" << myrank << endl;
 
   for (int a = 0; a<py; a++) {
     for (int b = 0; b<px; b++) {
@@ -259,13 +267,16 @@ int main (int argc, char** argv)
   // Integer timestep number
   int niter=0;
 
+  cout << "Before while" << myrank << endl;
+
   while (t<T) {
     
     t += dt;
     niter++;
 
-    simulate(my_E, my_E_prev, my_R, alpha, n, m, kk, dt, a, epsilon, M1, M2, b);
+    simulate(my_E, my_E_prev, my_R, alpha, grid_size_x, grid_size_y, kk, dt, a, epsilon, M1, M2, b);
 
+    cout << "Before north" << myrank << endl;
     // North neighbour -> ghost1
     if (myrank / px == 0) { // They are in first row
       // Mirror upper bound
@@ -274,10 +285,11 @@ int main (int argc, char** argv)
     }
     else {
       // We can send like this because it is contigious
-      MPI_Irecv(ghost1, grid_size_x+2, MPI_DOUBLE, (myrank / px - 1)*px + (myrank % px), 1, MPI_COMM_WORLD, &request[0]);
+      MPI_Irecv(ghost1, grid_size_x+2, MPI_DOUBLE, (myrank / px - 1)*px + (myrank % px), 1, MPI_COMM_WORLD, &request[4*myrank + 0]);
       MPI_Send(my_E[1], grid_size_x+2, MPI_DOUBLE, (myrank / px - 1)*px + (myrank % px), 2, MPI_COMM_WORLD);
     }
 
+    cout << "Before south" << myrank << endl;
     // South neighbour -> ghost2
     if (myrank / px == py - 1) { // They are in last row
       // Mirror lower bound
@@ -286,10 +298,11 @@ int main (int argc, char** argv)
     }
     else {
       // We can send like this because it is contigious
-      MPI_Irecv(ghost2, grid_size_x+2, MPI_DOUBLE, (myrank / px + 1)*px + (myrank % px), 1, MPI_COMM_WORLD, &request[1]);
+      MPI_Irecv(ghost2, grid_size_x+2, MPI_DOUBLE, (myrank / px + 1)*px + (myrank % px), 1, MPI_COMM_WORLD, &request[4*myrank + 1]);
       MPI_Send(my_E[grid_size_y], grid_size_x+2, MPI_DOUBLE, (myrank / px + 1)*px + (myrank % px), 2, MPI_COMM_WORLD);
     }
 
+    cout << "Before left" << myrank << endl;
     // Left neighbour -> ghost3
     if (myrank % px == 0) { // They are in the leftmost column
       // Mirror leftmost bound
@@ -297,12 +310,13 @@ int main (int argc, char** argv)
         ghost3[j-1] = my_E[j][2];
     }
     else {
-      MPI_Irecv(ghost3, grid_size_y, MPI_DOUBLE, myrank - 1, 1, MPI_COMM_WORLD, &request[2]);
+      MPI_Irecv(ghost3, grid_size_y, MPI_DOUBLE, myrank - 1, 1, MPI_COMM_WORLD, &request[4*myrank + 2]);
       for (int i=1; i<=grid_size_y; i++)
 	send3[i-1] = my_E[i][1];
       MPI_Send(send3, grid_size_y, MPI_DOUBLE, myrank - 1, 2, MPI_COMM_WORLD);
     }
 
+    cout << "Before right" << myrank << endl;
     // Right neighbour -> ghost4
     if (myrank % px == px - 1) { // They are in the rightmost column
       // Mirror rightmost bound
@@ -310,14 +324,17 @@ int main (int argc, char** argv)
 	ghost4[j-1] = my_E[j][grid_size_x-1];
     }
     else {
-      MPI_Irecv(ghost4, grid_size_y, MPI_DOUBLE, myrank + 1, 1, MPI_COMM_WORLD, &request[3]);
+      MPI_Irecv(ghost4, grid_size_y, MPI_DOUBLE, myrank + 1, 1, MPI_COMM_WORLD, &request[4*myrank + 3]);
       for (int i=1; i<=grid_size_y; i++)
 	send4[i-1] = my_E[i][grid_size_x];
       MPI_Send(send4, grid_size_y, MPI_DOUBLE, myrank + 1, 2, MPI_COMM_WORLD);
     }
 
-    MPI_Waitall(4, request, &status);
+    cout << "Before Waitall" << myrank << endl;
+    // MPI_Waitall(4*P, request, &status);
 
+
+    cout << "After Waitall" << myrank << endl;
     // Maybe these need to be done in for loops
     my_E[0] = ghost1; // North
     my_E[grid_size_y+1] = ghost2; // South
@@ -331,42 +348,63 @@ int main (int argc, char** argv)
     //Update E_prev
     my_E_prev = my_E;
 
+    cout << "----------------------" << myrank << endl;
+
     // BARRIER
 
     if (plot_freq){
 
-      if (P != 1) { // If we are using more than 1 processor
-	if (myrank == 0) {
-	  for (int p=1; p<P; p++) {
-	    // What about blocking recv?
-	    MPI_Irecv(my_Es[p-1], (grid_size_y+2)*(grid_size_x+2), MPI_DOUBLE, p, 1, MPI_COMM_WORLD, &myE_request[p-1]);
-	  }
-	}
-	else {
-	  MPI_Send(my_E, (grid_size_y+2)*(grid_size_x+2), MPI_DOUBLE, 0, 2, MPI_COMM_WORLD);
-	}
-	MPI_Waitall(P-1, myE_request, &status);
-	for (int p=1; p<P; p++) {
-	  int a = p % px;
-	  int b = p / px;
-	  for (int i=0; i<grid_size_y+2; i++) {
-	    for (int j=0; j<grid_size_x+2; j++) {
-	      E[b*grid_size_y + i][a*grid_size_x + j] = my_Es[p-1][i][j];
-	    }
-	  }
-	}
-      }
-      else {
-	E = my_E;
-      }
+      // if (P != 1) { // If we are using more than 1 processor
+      // 	if (myrank == 0) {
+      // 	  for (int p=1; p<P; p++) {
+      // 	    // What about blocking recv?
+      // 	    MPI_Irecv(my_Es[p-1], (grid_size_y+2)*(grid_size_x+2), MPI_DOUBLE, p, 1, MPI_COMM_WORLD, &myE_request[p-1]);
+      // 	  }
+      // 	}
+      // 	else {
+      // 	  MPI_Send(my_E, (grid_size_y+2)*(grid_size_x+2), MPI_DOUBLE, 0, 2, MPI_COMM_WORLD);
+      // 	}
+      // 	MPI_Waitall(P-1, myE_request, &status);
+      // 	for (int p=1; p<P; p++) {
+      // 	  int a = p % px;
+      // 	  int b = p / px;
+      // 	  for (int i=0; i<grid_size_y+2; i++) {
+      // 	    for (int j=0; j<grid_size_x+2; j++) {
+      // 	      E[b*grid_size_y + i][a*grid_size_x + j] = my_Es[p-1][i][j];
+      // 	    }
+      // 	  }
+      // 	}
+      // }
+      // else {
+      // 	E = my_E;
+      // }
+
+      // MPI_Gather(E, my_E, )
 
       int k = (int)(t/plot_freq);
-      if ((t - k * plot_freq) < dt){
-    	splot(E,t,niter,m+2,n+2);
-      }
+      // if ((t - k * plot_freq) < dt){
+      // 	splot(E,t,niter,m+2,n+2);
+      // }
     }
 
   }//end of while loop
+
+  cout << "End of loop" << myrank << endl;
+
+  double **E2;
+  double my_E2[grid_size_y][grid_size_x];
+
+  cout << "After inits" << myrank << endl;
+
+  for (int i=1; i<=grid_size_y; i++)
+    for (int j=1; j<=grid_size_x; j++)
+      my_E2[i-1][j-1] = my_E[i][j];
+
+  cout << "After assigning" << myrank << endl;
+
+  MPI_Gather(my_E2, grid_size_y*grid_size_x, MPI_DOUBLE, E, m*n, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+
+  cout << "After Gather" << myrank << endl;
 
   if(myrank == 0) {
     double time_elapsed = getTime() - t0;
@@ -380,7 +418,7 @@ int main (int argc, char** argv)
     cout << "Sustained Bandwidth (GB/sec): " << BW << endl << endl; 
 
     double mx;
-    double l2norm = stats(E,m,n,&mx);
+    double l2norm = stats(E2,m,n,&mx);
     cout << "Max: " << mx <<  " L2norm: "<< l2norm << endl;
 
     if (plot_freq){
