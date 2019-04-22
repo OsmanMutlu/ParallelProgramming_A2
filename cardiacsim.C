@@ -299,7 +299,7 @@ int main (int argc, char** argv)
     else {
       MPI_Irecv(ghost3, grid_size_y, MPI_DOUBLE, myrank - 1, 1, MPI_COMM_WORLD, &request[2]);
       for (int i=1; i<=grid_size_y; i++)
-	send3[i-1] = my_E[i][1]
+	send3[i-1] = my_E[i][1];
       MPI_Send(send3, grid_size_y, MPI_DOUBLE, myrank - 1, 2, MPI_COMM_WORLD);
     }
 
@@ -312,7 +312,7 @@ int main (int argc, char** argv)
     else {
       MPI_Irecv(ghost4, grid_size_y, MPI_DOUBLE, myrank + 1, 1, MPI_COMM_WORLD, &request[3]);
       for (int i=1; i<=grid_size_y; i++)
-	send4[i-1] = my_E[i][grid_size_x]
+	send4[i-1] = my_E[i][grid_size_x];
       MPI_Send(send4, grid_size_y, MPI_DOUBLE, myrank + 1, 2, MPI_COMM_WORLD);
     }
 
@@ -335,25 +335,25 @@ int main (int argc, char** argv)
 
     if (plot_freq){
 
-      if ((px != 1) || (py != 1)) { // If we are using more than 1 processor
+      if (P != 1) { // If we are using more than 1 processor
 	if (myrank == 0) {
 	  for (int p=1; p<P; p++) {
 	    // What about blocking recv?
 	    MPI_Irecv(my_Es[p-1], (grid_size_y+2)*(grid_size_x+2), MPI_DOUBLE, p, 1, MPI_COMM_WORLD, &myE_request[p-1]);
 	  }
-	  MPI_Waitall(P-1, myE_request, &status);
-	  for (int p=1; p<P; p++) {
-	    int a = p % px;
-	    int b = p / px;
-	    for (int i=0; i<grid_size_y+2; i++) {
-	      for (int j=0; j<grid_size_x+2; j++) {
-		E[b*grid_size_y + i][a*grid_size_x + j] = my_Es[p][i][j];
-	      }
-	    }
-	  }
 	}
 	else {
 	  MPI_Send(my_E, (grid_size_y+2)*(grid_size_x+2), MPI_DOUBLE, 0, 2, MPI_COMM_WORLD);
+	}
+	MPI_Waitall(P-1, myE_request, &status);
+	for (int p=1; p<P; p++) {
+	  int a = p % px;
+	  int b = p / px;
+	  for (int i=0; i<grid_size_y+2; i++) {
+	    for (int j=0; j<grid_size_x+2; j++) {
+	      E[b*grid_size_y + i][a*grid_size_x + j] = my_Es[p-1][i][j];
+	    }
+	  }
 	}
       }
       else {
@@ -393,13 +393,14 @@ int main (int argc, char** argv)
     free (R);
   }
 
+  for (int i=0; i<P-1; i++) {
+    free (my_Es[i]);
+  }
   free (my_E);
   free (my_E_prev);
   free (my_R);
   free (ghost1);
   free (ghost2);
-  free (ghost3);
-  free (ghost4);
   MPI_Finalize();
   
   return 0;
