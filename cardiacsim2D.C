@@ -187,7 +187,7 @@ int main (int argc, char** argv)
   int grid_size_x = n/px;
   int grid_size_y = m/py;
 
-  double **my_E, **my_R, **my_E_prev, *ghost1, *ghost2, *ghost3, *ghost4;
+  double **my_E, **my_R, **my_E_prev, *ghost1, *ghost2, ghost3[grid_size_y], ghost4[grid_size_y], send3[grid_size_y], send4[grid_size_y];
 
   my_E = alloc2D(grid_size_y+2,grid_size_x+2);
   my_E_prev = alloc2D(grid_size_y+2,grid_size_x+2);
@@ -215,14 +215,14 @@ int main (int argc, char** argv)
       R[j][i] = 1.0;
   // }
 
-  for (int a = 0; a<px; a++) {
-    for (int b = 0; b<py; b++) {
+  for (int a = 0; a<py; a++) {
+    for (int b = 0; b<px; b++) {
       for (int i = 0; i<grid_size_y+2; i++) {
 	for (int j = 0; j<grid_size_x+2; j++) {
-	  if (myrank == b*px + a) {
-	    my_E[i][j] = E[b*grid_size_y + i][a*grid_size_x + j];
-	    my_E_prev[i][j] = E_prev[b*grid_size_y + i][a*grid_size_x + j];
-	    my_R[i][j] = R[b*grid_size_y + i][a*grid_size_x + j];
+	  if (myrank == a*px + b) {
+	    my_E[i][j] = E[a*grid_size_y + i][b*grid_size_x + j];
+	    my_E_prev[i][j] = E_prev[a*grid_size_y + i][b*grid_size_x + j];
+	    my_R[i][j] = R[a*grid_size_y + i][b*grid_size_x + j];
 	  }
 	}
       }
@@ -239,9 +239,10 @@ int main (int argc, char** argv)
   double alpha = d*dt/(dx*dx);
 
   // Start the timer
-  double t0 = getTime();
+  double t0;
 
   if (myrank == 0) {
+    t0 = getTime();
     cout << "Grid Size       : " << n << endl;
     cout << "Duration of Sim : " << T << endl;
     cout << "Time step dt    : " << dt << endl;
@@ -269,54 +270,68 @@ int main (int argc, char** argv)
     if (myrank / px == 0) { // They are in first row
       // Mirror upper bound
       for (int i=1; i<=grid_size_x; i++)
-	my_E[0][i] = my_E[2][i];      
+	ghost1[i] = my_E[2][i]; // Can this work without allocating?
     }
     else {
-      MPI_Irecv(ghost1, grid_size_x, MPI_DOUBLE, myrank / px - 1, 1, MPI_COMM_WORLD, &request[0]);
-      MPI_Send(my_E[1], grid_size_x, MPI_DOUBLE, myrank / px - 1, 2, MPI_COMM_WORLD);
-      my_E[0] = ghost1;
+      // We can send like this because it is contigious
+      MPI_Irecv(ghost1, grid_size_x+2, MPI_DOUBLE, (myrank / px - 1)*px + (myrank % px), 1, MPI_COMM_WORLD, &request[0]);
+      MPI_Send(my_E[1], grid_size_x+2, MPI_DOUBLE, (myrank / px - 1)*px + (myrank % px), 2, MPI_COMM_WORLD);
     }
 
     // South neighbour -> ghost2
     if (myrank / px == py - 1) { // They are in last row
       // Mirror lower bound
       for (int i=1; i<=grid_size_x; i++)
-	E[grid_size_y+1][i] = E[grid_size_y-1][i];
+        ghost2[i] = my_E[grid_size_y-1][i]; // Can this work without allocating?
     }
     else {
-      MPI_Irecv(ghost2, grid_size_x, MPI_DOUBLE, myrank / px + 1, 1, MPI_COMM_WORLD, &request[1]);
-      MPI_Send(my_E[grid_size_y], grid_size_x, MPI_DOUBLE, myrank / px + 1, 2, MPI_COMM_WORLD);
-      my_E[grid_size_y+1] = ghost2;
+      // We can send like this because it is contigious
+      MPI_Irecv(ghost2, grid_size_x+2, MPI_DOUBLE, (myrank / px + 1)*px + (myrank % px), 1, MPI_COMM_WORLD, &request[1]);
+      MPI_Send(my_E[grid_size_y], grid_size_x+2, MPI_DOUBLE, (myrank / px + 1)*px + (myrank % px), 2, MPI_COMM_WORLD);
     }
 
     // Left neighbour -> ghost3
     if (myrank % px == 0) { // They are in the leftmost column
       // Mirror leftmost bound
       for (int j=1; j<=grid_size_y; j++)
-	my_E[j][0] = my_E[j][2];
+        ghost3[j-1] = my_E[j][2];
     }
     else {
-      MPI_Irecv(ghost3, grid_size_y, MPI_DOUBLE, myrank % px - 1, 1, MPI_COMM_WORLD, &request[2]);
-      MPI_Send(my_E[1], grid_size_y, MPI_DOUBLE, myrank % px - 1, 2, MPI_COMM_WORLD);
-      my_E[0] = ghost3;
+      MPI_Irecv(ghost3, grid_size_y, MPI_DOUBLE, myrank - 1, 1, MPI_COMM_WORLD, &request[2]);
+      for (int i=1; i<=grid_size_y; i++)
+	send3[i-1] = my_E[i][1]
+      MPI_Send(send3, grid_size_y, MPI_DOUBLE, myrank - 1, 2, MPI_COMM_WORLD);
     }
 
     // Right neighbour -> ghost4
-    if (myrank / px == py - 1) { // They are in the rightmost column
+    if (myrank % px == px - 1) { // They are in the rightmost column
       // Mirror rightmost bound
       for (int j=1; j<=grid_size_y; j++)
-	my_E[j][grid_size_x+1] = my_E[j][grid_size_x-1];
+	ghost4[j-1] = my_E[j][grid_size_x-1];
     }
     else {
-      MPI_Irecv(ghost4, grid_size_y, MPI_DOUBLE, myrank % px + 1, 1, MPI_COMM_WORLD, &request[3]);
-      MPI_Send(my_E[grid_size_x], grid_size_y, MPI_DOUBLE, myrank % px + 1, 2, MPI_COMM_WORLD);
-      my_E[grid_size_x+1] = ghost4;
+      MPI_Irecv(ghost4, grid_size_y, MPI_DOUBLE, myrank + 1, 1, MPI_COMM_WORLD, &request[3]);
+      for (int i=1; i<=grid_size_y; i++)
+	send4[i-1] = my_E[i][grid_size_x]
+      MPI_Send(send4, grid_size_y, MPI_DOUBLE, myrank + 1, 2, MPI_COMM_WORLD);
     }
 
     MPI_Waitall(4, request, &status);
 
+    // Maybe these need to be done in for loops
+    my_E[0] = ghost1; // North
+    my_E[grid_size_y+1] = ghost2; // South
+    for (int i=1; i<=grid_size_y; i++) { // Left
+      my_E[i][0] = ghost3[i-1];
+    }
+    for (int i=1; i<=grid_size_y; i++) { // Right
+      my_E[i][grid_size_x+1] = ghost4[i-1];
+    }
+
     //Update E_prev
     my_E_prev = my_E;
+
+    // BARRIER
 
     if (plot_freq){
 
