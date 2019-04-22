@@ -132,6 +132,9 @@ int main (int argc, char** argv)
   MPI_Status status;
   MPI_Request request[4];
 
+  MPI_Request myE_request[P-1];
+  double **my_Es[P-1];
+
   double T=1000.0;
   int m=200,n=200;
   int plot_freq = 0;
@@ -141,21 +144,19 @@ int main (int argc, char** argv)
 
   double **E, **R, **E_prev;
 
-  if(myrank == 0) {
+  if (myrank == 0) {
     cmdLine( argc, argv, T, n,px, py, plot_freq, no_comm, num_threads);
 
     if (P != px*py) {
       cout << "Your px*py must be equal to the total amount of processors" << endl;
-      return 0;
+      return(-1);
     }
 
     if ((n % px != 0) || (m % py != 0)) {
       cout << "Please make sure that your n is divisible by px and your m is divisible by py" << endl;
-      return 0;
+      return(-1);
     }
 
-    MPI_Request myE_request[P-1];
-    double **my_Es[P-1];
   }
   // Various constants - these definitions shouldn't change
   const double a=0.1, b=0.1, kk=8.0, M1= 0.07, M2=0.3, epsilon=0.01, d=5e-5;
@@ -271,7 +272,7 @@ int main (int argc, char** argv)
 	my_E[0][i] = my_E[2][i];      
     }
     else {
-      MPI_Irecv(ghost1, grid_size_x, MPI_DOUBLE, myrank / px - 1, 1, MPI_COMM_WORLD, request[0]);
+      MPI_Irecv(ghost1, grid_size_x, MPI_DOUBLE, myrank / px - 1, 1, MPI_COMM_WORLD, &request[0]);
       MPI_Send(my_E[1], grid_size_x, MPI_DOUBLE, myrank / px - 1, 2, MPI_COMM_WORLD);
       my_E[0] = ghost1;
     }
@@ -283,7 +284,7 @@ int main (int argc, char** argv)
 	E[grid_size_y+1][i] = E[grid_size_y-1][i];
     }
     else {
-      MPI_Irecv(ghost2, grid_size_x, MPI_DOUBLE, myrank / px + 1, 1, MPI_COMM_WORLD, request[1]);
+      MPI_Irecv(ghost2, grid_size_x, MPI_DOUBLE, myrank / px + 1, 1, MPI_COMM_WORLD, &request[1]);
       MPI_Send(my_E[grid_size_y], grid_size_x, MPI_DOUBLE, myrank / px + 1, 2, MPI_COMM_WORLD);
       my_E[grid_size_y+1] = ghost2;
     }
@@ -295,7 +296,7 @@ int main (int argc, char** argv)
 	my_E[j][0] = my_E[j][2];
     }
     else {
-      MPI_Irecv(ghost3, grid_size_y, MPI_DOUBLE, myrank % px - 1, 1, MPI_COMM_WORLD, request[2]);
+      MPI_Irecv(ghost3, grid_size_y, MPI_DOUBLE, myrank % px - 1, 1, MPI_COMM_WORLD, &request[2]);
       MPI_Send(my_E[1], grid_size_y, MPI_DOUBLE, myrank % px - 1, 2, MPI_COMM_WORLD);
       my_E[0] = ghost3;
     }
@@ -307,7 +308,7 @@ int main (int argc, char** argv)
 	my_E[j][grid_size_x+1] = my_E[j][grid_size_x-1];
     }
     else {
-      MPI_Irecv(ghost4, grid_size_y, MPI_DOUBLE, myrank % px + 1, 1, MPI_COMM_WORLD, request[3]);
+      MPI_Irecv(ghost4, grid_size_y, MPI_DOUBLE, myrank % px + 1, 1, MPI_COMM_WORLD, &request[3]);
       MPI_Send(my_E[grid_size_x], grid_size_y, MPI_DOUBLE, myrank % px + 1, 2, MPI_COMM_WORLD);
       my_E[grid_size_x+1] = ghost4;
     }
@@ -323,7 +324,7 @@ int main (int argc, char** argv)
 	if (myrank == 0) {
 	  for (int p=1; p<P; p++) {
 	    // What about blocking recv?
-	    MPI_Irecv(my_Es[p-1], (grid_size_y+2)*(grid_size_x+2), MPI_DOUBLE, p, 1, MPI_COMM_WORLD, myE_request[p-1]);
+	    MPI_Irecv(my_Es[p-1], (grid_size_y+2)*(grid_size_x+2), MPI_DOUBLE, p, 1, MPI_COMM_WORLD, &myE_request[p-1]);
 	  }
 	  MPI_Waitall(P-1, myE_request, &status);
 	  for (int p=1; p<P; p++) {
