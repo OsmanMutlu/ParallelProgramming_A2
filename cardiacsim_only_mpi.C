@@ -15,7 +15,6 @@
 #include <math.h>
 #include <sys/time.h>
 #include <mpi.h>
-#include <omp.h>
 using namespace std;
 
 
@@ -103,20 +102,14 @@ void simulate (double** E,  double** E_prev,double** R,
      * Solve the ODE, advancing excitation and recovery to the
      *     next timtestep
      */
-#pragma omp parallel private(i,j)
-    {
-
-#pragma omp for collapse(2)
     for (j=1; j<=m; j++){
       for (i=1; i<=n; i++)
 	E[j][i] = E[j][i] -dt*(kk* E[j][i]*(E[j][i] - a)*(E[j][i]-1)+ E[j][i] *R[j][i]);
     }
-
-#pragma omp for collapse(2)    
+    
     for (j=1; j<=m; j++){
       for (i=1; i<=n; i++)
 	R[j][i] = R[j][i] + dt*(epsilon+M1* R[j][i]/( E[j][i]+M2))*(-R[j][i]-kk* E[j][i]*(E[j][i]-b-1));
-    }
     }
     
 }
@@ -276,7 +269,6 @@ int main (int argc, char** argv)
     // North neighbour -> ghost1
     if (myrank / px == 0) { // They are in first row
       // Mirror upper bound
-      #pragma omp parallel for
       for (int i=1; i<=grid_size_x; i++)
 	ghost1[i] = my_E_prev[2][i];
     }
@@ -289,7 +281,6 @@ int main (int argc, char** argv)
     // South neighbour -> ghost2
     if (myrank / px == py - 1) { // They are in last row
       // Mirror lower bound
-      #pragma omp parallel for
       for (int i=1; i<=grid_size_x; i++)
         ghost2[i] = my_E_prev[grid_size_y-1][i];
     }
@@ -302,7 +293,6 @@ int main (int argc, char** argv)
     // Left neighbour -> ghost3
     if (myrank % px == 0) { // They are in the leftmost column
       // Mirror leftmost bound
-      #pragma omp parallel for
       for (int j=1; j<=grid_size_y; j++)
         ghost3[j-1] = my_E_prev[j][2];
     }
@@ -316,7 +306,6 @@ int main (int argc, char** argv)
     // Right neighbour -> ghost4
     if (myrank % px == px - 1) { // They are in the rightmost column
       // Mirror rightmost bound
-      #pragma omp parallel for
       for (int j=1; j<=grid_size_y; j++)
     	ghost4[j-1] = my_E_prev[j][grid_size_x-1];
     }
@@ -329,20 +318,16 @@ int main (int argc, char** argv)
 
     MPI_Waitall(4*P, request, status);
 
-    #pragma omp parallel for
     for (int i=1; i<=grid_size_x; i++) { // North
       my_E_prev[0][i] = ghost1[i];
     }
-    #pragma omp parallel for
     for (int i=1; i<=grid_size_x; i++) { // South
       my_E_prev[grid_size_y+1][i] = ghost2[i];
     }
 
-    #pragma omp parallel for
     for (int i=1; i<=grid_size_y; i++) { // Left
       my_E_prev[i][0] = ghost3[i-1];
     }
-    #pragma omp parallel for
     for (int i=1; i<=grid_size_y; i++) { // Right
       my_E_prev[i][grid_size_x+1] = ghost4[i-1];
     }

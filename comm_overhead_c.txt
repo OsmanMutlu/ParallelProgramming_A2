@@ -1,0 +1,385 @@
+Loading openmpi module ...
+Loading GCC module ...
+
+======================================================================================
+SLURM_CHECKPOINT_IMAGE_DIR=/var/slurm/checkpoint
+SLURM_NODELIST=me01
+LC_PAPER=tr_TR.UTF-8
+SLURM_JOB_NAME=cardiac-sim
+MANPATH=/kuacc/apps/gcc/7.3.0/share/man:/kuacc/apps/gcc/7.3.0/man:/kuacc/apps/julia/0.6.2/share/man:/usr/share/man:/usr/local/share/man
+LC_ADDRESS=tr_TR.UTF-8
+XDG_SESSION_ID=86540
+SLURMD_NODENAME=me01
+SLURM_TOPOLOGY_ADDR=me01
+SLURM_NTASKS_PER_NODE=16
+LC_MONETARY=tr_TR.UTF-8
+HOSTNAME=me01
+SLURM_PRIO_PROCESS=0
+SLURM_NODE_ALIASES=(null)
+SHELL=/bin/bash
+TERM=xterm-256color
+SLURM_JOB_QOS=users
+HISTSIZE=1000
+TMPDIR=/tmp
+SLURM_TOPOLOGY_ADDR_PATTERN=node
+SSH_CLIENT=172.20.32.144 39040 22
+LIBRARY_PATH=/kuacc/apps/mpich/3.2.1/lib64:/kuacc/apps/mpich/3.2.1/lib:/usr/local/cuda-8.0/lib64:/usr/local/cuda-8.0/lib:/kuacc/apps/julia/0.6.2/lib
+LC_NUMERIC=tr_TR.UTF-8
+QTDIR=/usr/lib64/qt-3.3
+QTINC=/usr/lib64/qt-3.3/include
+SSH_TTY=/dev/pts/0
+SLURM_MEM_PER_CPU=14000
+QT_GRAPHICSSYSTEM_CHECKED=1
+SLURM_NNODES=1
+USER=omutlu
+CUDA_HOME=/usr/local/cuda-8.0
+LC_TELEPHONE=tr_TR.UTF-8
+LS_COLORS=rs=0:di=38;5;27:ln=38;5;51:mh=44;38;5;15:pi=40;38;5;11:so=38;5;13:do=38;5;5:bd=48;5;232;38;5;11:cd=48;5;232;38;5;3:or=48;5;232;38;5;9:mi=05;48;5;232;38;5;15:su=48;5;196;38;5;15:sg=48;5;11;38;5;16:ca=48;5;196;38;5;226:tw=48;5;10;38;5;16:ow=48;5;10;38;5;21:st=48;5;21;38;5;15:ex=38;5;34:*.tar=38;5;9:*.tgz=38;5;9:*.arc=38;5;9:*.arj=38;5;9:*.taz=38;5;9:*.lha=38;5;9:*.lz4=38;5;9:*.lzh=38;5;9:*.lzma=38;5;9:*.tlz=38;5;9:*.txz=38;5;9:*.tzo=38;5;9:*.t7z=38;5;9:*.zip=38;5;9:*.z=38;5;9:*.Z=38;5;9:*.dz=38;5;9:*.gz=38;5;9:*.lrz=38;5;9:*.lz=38;5;9:*.lzo=38;5;9:*.xz=38;5;9:*.bz2=38;5;9:*.bz=38;5;9:*.tbz=38;5;9:*.tbz2=38;5;9:*.tz=38;5;9:*.deb=38;5;9:*.rpm=38;5;9:*.jar=38;5;9:*.war=38;5;9:*.ear=38;5;9:*.sar=38;5;9:*.rar=38;5;9:*.alz=38;5;9:*.ace=38;5;9:*.zoo=38;5;9:*.cpio=38;5;9:*.7z=38;5;9:*.rz=38;5;9:*.cab=38;5;9:*.jpg=38;5;13:*.jpeg=38;5;13:*.gif=38;5;13:*.bmp=38;5;13:*.pbm=38;5;13:*.pgm=38;5;13:*.ppm=38;5;13:*.tga=38;5;13:*.xbm=38;5;13:*.xpm=38;5;13:*.tif=38;5;13:*.tiff=38;5;13:*.png=38;5;13:*.svg=38;5;13:*.svgz=38;5;13:*.mng=38;5;13:*.pcx=38;5;13:*.mov=38;5;13:*.mpg=38;5;13:*.mpeg=38;5;13:*.m2v=38;5;13:*.mkv=38;5;13:*.webm=38;5;13:*.ogm=38;5;13:*.mp4=38;5;13:*.m4v=38;5;13:*.mp4v=38;5;13:*.vob=38;5;13:*.qt=38;5;13:*.nuv=38;5;13:*.wmv=38;5;13:*.asf=38;5;13:*.rm=38;5;13:*.rmvb=38;5;13:*.flc=38;5;13:*.avi=38;5;13:*.fli=38;5;13:*.flv=38;5;13:*.gl=38;5;13:*.dl=38;5;13:*.xcf=38;5;13:*.xwd=38;5;13:*.yuv=38;5;13:*.cgm=38;5;13:*.emf=38;5;13:*.axv=38;5;13:*.anx=38;5;13:*.ogv=38;5;13:*.ogx=38;5;13:*.aac=38;5;45:*.au=38;5;45:*.flac=38;5;45:*.mid=38;5;45:*.midi=38;5;45:*.mka=38;5;45:*.mp3=38;5;45:*.mpc=38;5;45:*.ogg=38;5;45:*.ra=38;5;45:*.wav=38;5;45:*.axa=38;5;45:*.oga=38;5;45:*.spx=38;5;45:*.xspf=38;5;45:
+LD_LIBRARY_PATH=/kuacc/apps/mpich/3.2.1/lib64:/kuacc/apps/mpich/3.2.1/lib:/kuacc/apps/gcc/7.3.0/lib64:/kuacc/apps/gcc/7.3.0/lib:/kuacc/apps/cudnn/v7.0.5_CUDA_8.0/lib64:/usr/local/cuda-8.0/lib64:/usr/local/cuda-8.0/lib:/kuacc/apps/julia/0.6.2/lib
+SLURM_JOBID=1098319
+CPATH=/kuacc/apps/mpich/3.2.1/include:/kuacc/apps/cudnn/v7.0.5_CUDA_8.0/include:/usr/local/cuda-8.0/include:/kuacc/apps/julia/0.6.2/include
+SLURM_NTASKS=16
+SLURM_TASKS_PER_NODE=16
+PATH=/kuacc/apps/mpich/3.2.1/share:/kuacc/apps/mpich/3.2.1/bin:/kuacc/apps/mpich/3.2.1:/kuacc/apps/gcc/7.3.0/libexec/gcc/x86_64-pc-linux-gnu/7:/kuacc/apps/gcc/7.3.0/bin:/scratch/users/omutlu/miniconda2/bin:/scratch/users/omutlu/miniconda3/bin:/usr/local/cuda-8.0/bin:/kuacc/apps/julia/0.6.2/bin:/kuacc/apps/julia/0.6.2:/usr/lib64/qt-3.3/bin:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/kuacc/apps/scripts:/kuacc/users/omutlu/.local/bin:/kuacc/users/omutlu/bin
+MAIL=/var/spool/mail/omutlu
+SLURM_JOB_ID=1098319
+LC_IDENTIFICATION=tr_TR.UTF-8
+SLURM_JOB_USER=omutlu
+PWD=/scratch/users/omutlu
+CUDA_VISIBLE_DEVICES=NoDevFiles
+_LMFILES_=/kuacc/etc/mod/julia/0.6.2:/kuacc/etc/mod/cuda/8.0:/kuacc/etc/mod/cudnn/7.0.5/cuda-8.0:/kuacc/etc/mod/gcc/7.3.0:/kuacc/etc/mod/mpich/3.2.1
+LANG=en_US.UTF-8
+MODULEPATH=/kuacc/etc/mod
+SLURM_JOB_UID=667500
+LC_MEASUREMENT=tr_TR.UTF-8
+LOADEDMODULES=julia/0.6.2:cuda/8.0:cudnn/7.0.5/cuda-8.0:gcc/7.3.0:mpich/3.2.1
+SLURM_NODEID=0
+SLURM_SUBMIT_DIR=/scratch/users/omutlu
+SLURM_TASK_PID=7440
+SLURM_NPROCS=16
+SLURM_CPUS_ON_NODE=16
+CXX=/kuacc/apps/gcc/7.3.0/bin/g++
+SLURM_PROCID=0
+ENVIRONMENT=BATCH
+KRB5CCNAME=KEYRING:persistent:667500
+HISTCONTROL=ignoredups
+SSH_ASKPASS=/usr/libexec/openssh/gnome-ssh-askpass
+SLURM_JOB_NODELIST=me01
+HOME=/kuacc/users/omutlu
+SHLVL=2
+SLURM_LOCALID=0
+SLURM_JOB_GID=200513
+SLURM_JOB_CPUS_PER_NODE=16
+SLURM_CLUSTER_NAME=kuacc
+GCC=/kuacc/apps/gcc/7.3.0/bin/gcc
+SLURM_GTIDS=0
+SLURM_SUBMIT_HOST=login03.kuacc.ku.edu.tr
+SLURM_JOB_PARTITION=short
+LOGNAME=omutlu
+QTLIB=/usr/lib64/qt-3.3/lib
+GPU_DEVICE_ORDINAL=NoDevFiles
+SLURM_JOB_ACCOUNT=users
+LC_CTYPE=en_US.UTF-8
+SSH_CONNECTION=172.20.32.144 39040 172.20.238.3 22
+SLURM_JOB_NUM_NODES=1
+MODULESHOME=/usr/share/Modules
+LESSOPEN=||/usr/bin/lesspipe.sh %s
+CC=/kuacc/apps/gcc/7.3.0/bin/gcc
+XDG_RUNTIME_DIR=/run/user/667500
+LC_TIME=tr_TR.UTF-8
+LC_NAME=tr_TR.UTF-8
+BASH_FUNC_module()=() {  eval `/usr/bin/modulecmd bash $*`
+}
+_=/usr/bin/env
+======================================================================================
+
+Setting stack size to unlimited...
+core file size          (blocks, -c) 0
+data seg size           (kbytes, -d) unlimited
+scheduling priority             (-e) 0
+file size               (blocks, -f) unlimited
+pending signals                 (-i) 1029926
+max locked memory       (kbytes, -l) unlimited
+max memory size         (kbytes, -m) 229376000
+open files                      (-n) 1024
+pipe size            (512 bytes, -p) 8
+POSIX message queues     (bytes, -q) 819200
+real-time priority              (-r) 0
+stack size              (kbytes, -s) unlimited
+cpu time               (seconds, -t) unlimited
+max user processes              (-u) 4096
+virtual memory          (kbytes, -v) unlimited
+file locks                      (-x) unlimited
+
+With 1D geometry :
+N = 1024:
+With Comm:
+Grid Size       : 1024
+Duration of Sim : 100
+Time step dt    : 0.00431553
+Process geometry: 1 x 16
+
+Number of Iterations        : 23173
+Elapsed Time (sec)          : 8.34437
+Sustained Gflops Rate       : 81.5354
+Sustained Bandwidth (GB/sec): 93.1834
+
+Max: 0.979365 L2norm: 0.498186
+With Comm Disabled:
+Grid Size       : 1024
+Duration of Sim : 100
+Time step dt    : 0.00431553
+Process geometry: 1 x 16
+Communication   : DISABLED
+
+Number of Iterations        : 23173
+Elapsed Time (sec)          : 8.42486
+Sustained Gflops Rate       : 80.7565
+Sustained Bandwidth (GB/sec): 92.2931
+
+Max: 0.979365 L2norm: 0.498186
+---------------------------------------------------
+N = 768:
+With Comm:
+Grid Size       : 768
+Duration of Sim : 100
+Time step dt    : 0.00739963
+Process geometry: 1 x 16
+
+Number of Iterations        : 13515
+Elapsed Time (sec)          : 2.83602
+Sustained Gflops Rate       : 78.7022
+Sustained Bandwidth (GB/sec): 89.9454
+
+Max: 0.979414 L2norm: 0.49833
+With Comm Disabled:
+Grid Size       : 768
+Duration of Sim : 100
+Time step dt    : 0.00739963
+Process geometry: 1 x 16
+Communication   : DISABLED
+
+Number of Iterations        : 13515
+Elapsed Time (sec)          : 2.75853
+Sustained Gflops Rate       : 80.913
+Sustained Bandwidth (GB/sec): 92.472
+
+Max: 0.979414 L2norm: 0.49833
+---------------------------------------------------
+N = 512:
+With Comm:
+Grid Size       : 512
+Duration of Sim : 100
+Time step dt    : 0.0151156
+Process geometry: 1 x 16
+
+Number of Iterations        : 6616
+Elapsed Time (sec)          : 0.643104
+Sustained Gflops Rate       : 75.5113
+Sustained Bandwidth (GB/sec): 86.2987
+
+Max: 0.979509 L2norm: 0.498709
+With Comm Disabled:
+Grid Size       : 512
+Duration of Sim : 100
+Time step dt    : 0.0151156
+Process geometry: 1 x 16
+Communication   : DISABLED
+
+Number of Iterations        : 6616
+Elapsed Time (sec)          : 0.676236
+Sustained Gflops Rate       : 71.8117
+Sustained Bandwidth (GB/sec): 82.0705
+
+Max: 0.979509 L2norm: 0.498709
+---------------------------------------------------
+N = 384:
+With Comm:
+Grid Size       : 384
+Duration of Sim : 100
+Time step dt    : 0.0238028
+Process geometry: 1 x 16
+
+Number of Iterations        : 4202
+Elapsed Time (sec)          : 0.327517
+Sustained Gflops Rate       : 52.9715
+Sustained Bandwidth (GB/sec): 60.5389
+
+Max: 0.979615 L2norm: 0.499272
+With Comm Disabled:
+Grid Size       : 384
+Duration of Sim : 100
+Time step dt    : 0.0238028
+Process geometry: 1 x 16
+Communication   : DISABLED
+
+Number of Iterations        : 4202
+Elapsed Time (sec)          : 0.277539
+Sustained Gflops Rate       : 62.5104
+Sustained Bandwidth (GB/sec): 71.4405
+
+Max: 0.979615 L2norm: 0.499272
+---------------------------------------------------
+N = 256:
+With Comm:
+Grid Size       : 256
+Duration of Sim : 100
+Time step dt    : 0.0403788
+Process geometry: 1 x 16
+
+Number of Iterations        : 2477
+Elapsed Time (sec)          : 0.193436
+Sustained Gflops Rate       : 23.4978
+Sustained Bandwidth (GB/sec): 26.8546
+
+Max: 0.979723 L2norm: 0.500622
+With Comm Disabled:
+Grid Size       : 256
+Duration of Sim : 100
+Time step dt    : 0.0403788
+Process geometry: 1 x 16
+Communication   : DISABLED
+
+Number of Iterations        : 2477
+Elapsed Time (sec)          : 0.101026
+Sustained Gflops Rate       : 44.9915
+Sustained Bandwidth (GB/sec): 51.4189
+
+Max: 0.979723 L2norm: 0.500622
+=====================================================
+With 2D geometry :
+N = 1024:
+With Comm:
+Grid Size       : 1024
+Duration of Sim : 100
+Time step dt    : 0.00431553
+Process geometry: 4 x 4
+
+Number of Iterations        : 23173
+Elapsed Time (sec)          : 8.35131
+Sustained Gflops Rate       : 81.4678
+Sustained Bandwidth (GB/sec): 93.106
+
+Max: 0.979365 L2norm: 0.498186
+With Comm Disabled:
+Grid Size       : 1024
+Duration of Sim : 100
+Time step dt    : 0.00431553
+Process geometry: 4 x 4
+Communication   : DISABLED
+
+Number of Iterations        : 23173
+Elapsed Time (sec)          : 8.31178
+Sustained Gflops Rate       : 81.8552
+Sustained Bandwidth (GB/sec): 93.5488
+
+Max: 0.979365 L2norm: 0.498186
+---------------------------------------------------
+N = 768:
+With Comm:
+Grid Size       : 768
+Duration of Sim : 100
+Time step dt    : 0.00739963
+Process geometry: 4 x 4
+
+Number of Iterations        : 13515
+Elapsed Time (sec)          : 2.8225
+Sustained Gflops Rate       : 79.0792
+Sustained Bandwidth (GB/sec): 90.3763
+
+Max: 0.979414 L2norm: 0.49833
+With Comm Disabled:
+Grid Size       : 768
+Duration of Sim : 100
+Time step dt    : 0.00739963
+Process geometry: 4 x 4
+Communication   : DISABLED
+
+Number of Iterations        : 13515
+Elapsed Time (sec)          : 2.86527
+Sustained Gflops Rate       : 77.8988
+Sustained Bandwidth (GB/sec): 89.0271
+
+Max: 0.979414 L2norm: 0.49833
+---------------------------------------------------
+N = 512:
+With Comm:
+Grid Size       : 512
+Duration of Sim : 100
+Time step dt    : 0.0151156
+Process geometry: 4 x 4
+
+Number of Iterations        : 6616
+Elapsed Time (sec)          : 0.646179
+Sustained Gflops Rate       : 75.152
+Sustained Bandwidth (GB/sec): 85.888
+
+Max: 0.979509 L2norm: 0.498709
+With Comm Disabled:
+Grid Size       : 512
+Duration of Sim : 100
+Time step dt    : 0.0151156
+Process geometry: 4 x 4
+Communication   : DISABLED
+
+Number of Iterations        : 6616
+Elapsed Time (sec)          : 0.778467
+Sustained Gflops Rate       : 62.3811
+Sustained Bandwidth (GB/sec): 71.2927
+
+Max: 0.979509 L2norm: 0.498709
+---------------------------------------------------
+N = 384:
+With Comm:
+Grid Size       : 384
+Duration of Sim : 100
+Time step dt    : 0.0238028
+Process geometry: 4 x 4
+
+Number of Iterations        : 4202
+Elapsed Time (sec)          : 0.262132
+Sustained Gflops Rate       : 66.1845
+Sustained Bandwidth (GB/sec): 75.6394
+
+Max: 0.979615 L2norm: 0.499272
+With Comm Disabled:
+Grid Size       : 384
+Duration of Sim : 100
+Time step dt    : 0.0238028
+Process geometry: 4 x 4
+Communication   : DISABLED
+
+Number of Iterations        : 4202
+Elapsed Time (sec)          : 0.297687
+Sustained Gflops Rate       : 58.2796
+Sustained Bandwidth (GB/sec): 66.6053
+
+Max: 0.979615 L2norm: 0.499272
+---------------------------------------------------
+N = 256:
+With Comm:
+Grid Size       : 256
+Duration of Sim : 100
+Time step dt    : 0.0403788
+Process geometry: 4 x 4
+
+Number of Iterations        : 2477
+Elapsed Time (sec)          : 0.0930591
+Sustained Gflops Rate       : 48.8433
+Sustained Bandwidth (GB/sec): 55.821
+
+Max: 0.979723 L2norm: 0.500622
+With Comm Disabled:
+Grid Size       : 256
+Duration of Sim : 100
+Time step dt    : 0.0403788
+Process geometry: 4 x 4
+Communication   : DISABLED
+
+Number of Iterations        : 2477
+Elapsed Time (sec)          : 0.0895071
+Sustained Gflops Rate       : 50.7816
+Sustained Bandwidth (GB/sec): 58.0361
+
+Max: 0.979723 L2norm: 0.500622
+Finished with execution!

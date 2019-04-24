@@ -37,10 +37,10 @@ OPTIMIZATION    =  -O3
 #DEBUG          = -g
 
 C++FLAGS        += $(INCLUDES) $(ARCH_FLAGS) $(WARNINGS) $(OPTIMIZATION) \
-                  $(XTRAFLAGS) $(DEBUG)
+                  $(XTRAFLAGS) $(DEBUG) -fopenmp
 
 CFLAGS		+= $(INCLUDES) $(ARCH_FLAGS) $(WARNINGS) $(OPTIMIZATION) \
-                  $(XTRAFLAGS) $(DEBUG)
+                  $(XTRAFLAGS) $(DEBUG) -fopenmp
 
 FFLAGS		= $(ARCH_FLAGS) -O2 -fno-second-underscore -ff90 -fugly-complex
 

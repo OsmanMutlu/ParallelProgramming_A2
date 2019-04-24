@@ -1,0 +1,8 @@
+# First row is 1D geometry, second row is 2D geometry
+Serial : 8.84701  
+MPI 1 : 8.82012	  8.89064
+MPI 2 : 17.7053	  17.1547
+MPI 4 : 34.1731	  33.6765
+MPI 8 : 59.2271	  60.2983
+MPI 16 : 101.798  102.052
+MPI 32 : 187.849  1.22853
