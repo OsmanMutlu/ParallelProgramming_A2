@@ -172,7 +172,8 @@ int main (int argc, char** argv)
       return(-1);
     }
 
-    if ((n % px != 0) || (m % py != 0)) {
+    if ((n % px != 0) || (n % py != 0)) {
+      cout << px << py << n << m << endl;
       cout << "Please make sure that your n is divisible by px and your m is divisible by py" << endl;
       return(-1);
     }
@@ -241,6 +242,21 @@ int main (int argc, char** argv)
       R[j][i] = 1.0;
   // }
 
+
+  // for (j=0; j<=m+1; j++)
+  //   for (i=0; i<=n+1; i++)
+  //     E_prev[j][i] = rand() % 5;
+
+
+  // if (myrank == 0) {
+  //   cout << "Original E_prev" << endl;
+  //   for (int i=0; i<m+2; i++) {
+  //     cout << endl;
+  //     for (int j=0; j<n+2; j++)
+  // 	cout << E_prev[i][j];
+  //   }
+  // }
+
   // cout << "Before my_E inits" << myrank << endl;
 
   for (int a = 0; a<py; a++) {
@@ -256,6 +272,15 @@ int main (int argc, char** argv)
       }
     }
   }
+
+  // if (myrank == 0) {
+  //   cout << "Before exchange" << myrank << endl;
+  //   for (int i=0; i<grid_size_y+2; i++) {
+  //     cout << endl;
+  //     for (int j=0; j<grid_size_x+2; j++)
+  // 	cout << my_E_prev[i][j];
+  //   }
+  // }
 
   double dx = 1.0/n;
 
@@ -364,11 +389,13 @@ int main (int argc, char** argv)
     // }
     // Maybe these need to be done in for loops
     // my_E_prev[0] = ghost1; // North
-    for (int i=1; i<=grid_size_y; i++) { // North
+
+
+    for (int i=1; i<=grid_size_x; i++) { // North
       my_E_prev[0][i] = ghost1[i];
     }
     // my_E_prev[grid_size_y+1] = ghost2; // South
-    for (int i=1; i<=grid_size_y; i++) { // South
+    for (int i=1; i<=grid_size_x; i++) { // South
       my_E_prev[grid_size_y+1][i] = ghost2[i];
     }
 
@@ -379,12 +406,90 @@ int main (int argc, char** argv)
       my_E_prev[i][grid_size_x+1] = ghost4[i-1];
     }
 
+    // cout << "After exchange" << myrank << endl;
+    // for (int i=0; i<grid_size_y+2; i++) {
+    //   cout << endl;
+    //   for (int j=0; j<grid_size_x+2; j++)
+    // 	cout << my_E_prev[i][j];
+    // }
+
+
     // cout << "Before Simulate" << myrank << endl;
 
     simulate(my_E, my_E_prev, my_R, alpha, grid_size_x, grid_size_y, kk, dt, a, epsilon, M1, M2, b);
+    // if (myrank == 0) {
+    //   for (int i=1; i<=grid_size_x; i++)
+    // 	my_E_prev[grid_size_y][i] = 0;
+    //   for (int i=1; i<=grid_size_y; i++)
+    // 	my_E_prev[i][grid_size_x] = 0;
+    // }
+    // if (myrank == 1) {
+    //   for (int i=1; i<=grid_size_x; i++)
+    // 	my_E_prev[grid_size_y][i] = 1;
+    //   for (int i=1; i<=grid_size_y; i++)
+    // 	my_E_prev[i][1] = 1;
+    //   for (int i=1; i<=grid_size_y; i++)
+    // 	my_E_prev[i][grid_size_x] = 1;
+    // }
+
+    // if (myrank == 2) {
+    //   for (int i=1; i<=grid_size_x; i++)
+    // 	my_E_prev[grid_size_y][i] = 2;
+    //   for (int i=1; i<=grid_size_y; i++)
+    // 	my_E_prev[i][1] = 2;
+    // }
+    // if (myrank == 3) {
+    //   for (int i=1; i<=grid_size_x; i++)
+    // 	my_E_prev[1][i] = 3;
+    //   for (int i=1; i<=grid_size_y; i++)
+    // 	my_E_prev[i][grid_size_x] = 3;
+    //   for (int i=1; i<=grid_size_x; i++)
+    // 	my_E_prev[grid_size_y][i] = 3;
+    // }
+    // if (myrank == 4) {
+    //   for (int i=1; i<=grid_size_x; i++)
+    // 	my_E_prev[grid_size_y][i] = 4;
+    //   for (int i=1; i<=grid_size_y; i++)
+    // 	my_E_prev[i][grid_size_x] = 4;
+    //   for (int i=1; i<=grid_size_x; i++)
+    // 	my_E_prev[1][i] = 4;
+    //   for (int i=1; i<=grid_size_y; i++)
+    // 	my_E_prev[i][1] = 4;
+    // }
+    // if (myrank == 5) {
+    //   for (int i=1; i<=grid_size_x; i++)
+    // 	my_E_prev[1][i] = 5;
+    //   for (int i=1; i<=grid_size_y; i++)
+    // 	my_E_prev[i][1] = 5;
+    //   for (int i=1; i<=grid_size_x; i++)
+    // 	my_E_prev[grid_size_y][i] = 5;
+    // }
+
+    // if (myrank == 6) {
+    //   for (int i=1; i<=grid_size_x; i++)
+    // 	my_E_prev[1][i] = 6;
+    //   for (int i=1; i<=grid_size_y; i++)
+    // 	my_E_prev[i][grid_size_x] = 6;
+    // }
+    // if (myrank == 7) {
+    //   for (int i=1; i<=grid_size_x; i++)
+    // 	my_E_prev[1][i] = 7;
+    //   for (int i=1; i<=grid_size_y; i++)
+    // 	my_E_prev[i][1] = 7;
+    //   for (int i=1; i<=grid_size_y; i++)
+    // 	my_E_prev[i][grid_size_x] = 7;
+    // }
+    // if (myrank == 8) {
+    //   for (int i=1; i<=grid_size_x; i++)
+    // 	my_E_prev[1][i] = 8;
+    //   for (int i=1; i<=grid_size_y; i++)
+    // 	my_E_prev[i][1] = 8;
+    // }
+
 
     //Update E_prev
     // my_E_prev = my_E;
+
     double **tmp = my_E; my_E = my_E_prev; my_E_prev = tmp;
 
     // cout << "Before Barrier" << myrank << endl;
@@ -395,6 +500,15 @@ int main (int argc, char** argv)
     // cout << "----------------------" << myrank << endl;
 
   }//end of while loop
+
+  // if (myrank == 4) {
+  // cout << "After exchange" << myrank << endl;
+  // for (int i=0; i<grid_size_y+2; i++) {
+  //   cout << endl;
+  //   for (int j=0; j<grid_size_x+2; j++)
+  //     cout << my_E_prev[i][j];
+  // }
+  // }
 
   // cout << "End of loop" << myrank << endl;
 
@@ -416,11 +530,22 @@ int main (int argc, char** argv)
     for (int i=1; i<=grid_size_y; i++)
       for (int j=1; j<=grid_size_x; j++)
     	my_E2[i-1][j-1] = my_E_prev[i][j];
+
+    // if (myrank == 4) {
+    //   cout << "After exchange" << myrank << endl;
+    //   for (int i=0; i<grid_size_y; i++) {
+    // 	cout << endl;
+    // 	for (int j=0; j<grid_size_x; j++)
+    // 	  cout << my_E2[i][j];
+    //   }
+    // }
+
      
-    // cout << "After assigning" << myrank << endl;
+    // cout << "After assigning" << myrank << endl;    
     
     MPI_Barrier(MPI_COMM_WORLD);
-    MPI_Gather(&my_E2[0][0], grid_size_y*grid_size_x, MPI_DOUBLE, &E2[0][0], m*n, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    MPI_Gather(&my_E2[0][0], grid_size_y*grid_size_x, MPI_DOUBLE, &E2[0][0], grid_size_y*grid_size_x, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+
   }
   else {
     for (int i=1; i<=m; i++)
@@ -436,7 +561,12 @@ int main (int argc, char** argv)
   // 	// MPI_Irecv(my_E2, (grid_size_y+2)*(grid_size_x+2), MPI_DOUBLE, p, 1, MPI_COMM_WORLD, &myE_request[p-1]);
   // 	// MPI_Wait(&myE_request[p-1], &myE_status[p-1]);
   // 	MPI_Recv(my_E2, (grid_size_y+2)*(grid_size_x+2), MPI_DOUBLE, p, 1, MPI_COMM_WORLD, &myE_status[p-1]);
-  // 	cout << "After Recieve" << endl;
+  // 	cout << "After Recieve" << p << endl;
+  // 	for (int i=0; i<grid_size_y+2; i++) {
+  // 	  cout << endl;
+  // 	  for (int j=0; j<grid_size_x+2; j++)
+  // 	    cout << E2[i][j];
+  // 	}	
   // 	int a = p % px;
   // 	int b = p / px;
   // 	for (int i=1; i<=grid_size_y; i++) {
@@ -474,14 +604,16 @@ int main (int argc, char** argv)
     cout << "Sustained Gflops Rate       : " << Gflops << endl; 
     cout << "Sustained Bandwidth (GB/sec): " << BW << endl << endl; 
 
+    // cout << "After Gather" << myrank << endl;
+    // for (int i=0; i<m; i++) {
+    //   cout << endl;
+    //   for (int j=0; j<n; j++)
+    // 	cout << E2[i][j];
+    // }
+
     double mx;
     double l2norm = stats(E2,m,n,&mx);
     cout << "Max: " << mx <<  " L2norm: "<< l2norm << endl;
-
-    // if (plot_freq){
-    //   cout << "\n\nEnter any input to close the program and the plot..." << endl;
-    //   getchar();
-    // }
   
   }
 
